@@ -2,7 +2,9 @@
 title: "Reproducible Research Project 1"
 author: "Dimuthu Attanayake"
 date: "8/12/2020"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, echo = TRUE}
@@ -45,8 +47,15 @@ To read the file
 
 ```{r stimulation, echo=TRUE}
 activity <- read.csv("activity.csv")
+```
+
+```{r head, echo=TRUE}
 head(activity)
+```
+```{r str, echo=TRUE}
 str(activity)
+``` 
+
 summary(activity)
 ```
 
@@ -67,6 +76,7 @@ library(dplyr)
 total_steps <- tapply(activity$steps, activity$date, sum, na.rm = TRUE)
 head(total_steps)
 ```
+
 Histogram of the total number of steps taken each day
 
 ```{r step_histo, echo=TRUE}
@@ -80,12 +90,19 @@ g
 ```
 Mean and median of total number of steps per day
 
-```{r mean_median, echo=TRUE}
+```{r mean, echo=TRUE}
 mean_steps <- mean(total_steps)
 mean_steps
+```
+
+
+```{r median, echo=TRUE}
 median_steps <- median(total_steps)
 median_steps
 ```
+
+
+
 The mean number of steps is 9354 and the meadian number of steps is 10395.
 
 ##What is the average daily activity pattern?
@@ -95,7 +112,9 @@ Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5
 ```{r avg_steps, echo=TRUE}
 avg_steps <- tapply(activity$steps, activity$interval, mean, na.rm = TRUE)
 head(avg_steps)
+```
 
+```{r totNA, echo=TRUE}
 plot(names(avg_steps), avg_steps,  type="l", col = "red",main ="Average Number of Steps Vs Time Interval", xlab="Intervals", ylab="Average number of steps")
 ```
 
@@ -104,6 +123,9 @@ Which 5-minute interval, on average across all the days in the dataset, contains
 ```{r max_int, echo=TRUE}
 max_avg <- max(avg_steps)
 max_avg
+```
+
+```{r max_av, echo=TRUE}
 max_interval <- (names(avg_steps)[which(avg_steps==max(avg_steps))])
 max_interval
 ```
@@ -114,7 +136,7 @@ The maximum average number of steps(206) is contained in the 835th interval.
 
 Total number of NA
 
-```{r totNA, echo=TRUE}
+```{r tot_NA, echo=TRUE}
 tot_NA <- sum(is.na(activity$steps))
 tot_NA
 ```
