@@ -1,25 +1,183 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Reproducible Research Project 1"
+author: "Dimuthu Attanayake"
+date: "8/12/2020"
+output: html_document
 ---
 
+```{r setup, echo = TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Overview
 
-## Loading and preprocessing the data
+This is the first project for Reproducible Research course offered by the Johns Hopkins University on Coursera. The Course is part of the ten course specialization on data science offered by the university.
+
+For this assignment, data from a personal activity monitoring device, which collects data at 5 minute intervals through out the day is used. The data is collected over two months(October and November) in 2012, from an anonymous individual, and include the number of steps taken in 5 minute intervals each day.
+
+# Data
+
+Tha data is downloaded from [Git Hub Repository](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip) and  is stored in a comma-separated-value (CSV) file. There are a total of 17,568 observations in this dataset.
+
+The variables included in this dataset are:
+
+steps: Number of steps taking in a 5-minute interval (missing values are coded as \color{red}{\verb|NA|}NA)
+date: The date on which the measurement was taken in YYYY-MM-DD format
+interval: Identifier for the 5-minute interval in which measurement was taken
+
+## Downloading and Processing data
+
+To set the working directory
+```{r wd, echo=TRUE}
+
+setwd("C:/Users/dimut/desktop/Data Science/Reproducible Research")
+```
+
+Downloading and loading data onto R
+
+```{r download, echo=TRUE}
+library(RCurl)
+filePath <- getwd()
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",file.path(filePath,"./repdata%2Fdata%2Factivity.zip"))
+unzip("repdata%2Fdata%2Factivity.zip")
+```
+
+To read the file
+
+```{r stimulation, echo=TRUE}
+activity <- read.csv("activity.csv")
+head(activity)
+str(activity)
+summary(activity)
+```
+
+To adjust date format
+
+```{r date, echo=TRUE}
+activity$date <- as.Date(activity$date)
+```
 
 
+##What is mean total number of steps taken per day?
 
-## What is mean total number of steps taken per day?
+Total number of steps taken per day:
+```{r total_steps, echo=TRUE}
+library(reshape2)
+library(dplyr)
 
+total_steps <- tapply(activity$steps, activity$date, sum, na.rm = TRUE)
+head(total_steps)
+```
+Histogram of the total number of steps taken each day
 
+```{r step_histo, echo=TRUE}
+library(ggplot2)
 
-## What is the average daily activity pattern?
+TotSteps <- data.frame(total_steps)
+g <- ggplot(TotSteps,aes(x =total_steps) ) +
+        geom_histogram( binwidth = 1500 ,color="black" , fill = "purple" ) 
+g <- g + labs( title = "Total Number of Steps per Day", x= "Number of Steps", y= "Frequency") + xlim(c(0,25000))
+g
+```
+Mean and median of total number of steps per day
 
+```{r mean_median, echo=TRUE}
+mean_steps <- mean(total_steps)
+mean_steps
+median_steps <- median(total_steps)
+median_steps
+```
+The mean number of steps is 9354 and the meadian number of steps is 10395.
 
+##What is the average daily activity pattern?
 
-## Imputing missing values
+Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval(x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
+```{r avg_steps, echo=TRUE}
+avg_steps <- tapply(activity$steps, activity$interval, mean, na.rm = TRUE)
+head(avg_steps)
 
+plot(names(avg_steps), avg_steps,  type="l", col = "red",main ="Average Number of Steps Vs Time Interval", xlab="Intervals", ylab="Average number of steps")
+```
 
-## Are there differences in activity patterns between weekdays and weekends?
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+```{r max_int, echo=TRUE}
+max_avg <- max(avg_steps)
+max_avg
+max_interval <- (names(avg_steps)[which(avg_steps==max(avg_steps))])
+max_interval
+```
+
+The maximum average number of steps(206) is contained in the 835th interval. 
+
+##Imputing missing values
+
+Total number of NA
+
+```{r totNA, echo=TRUE}
+tot_NA <- sum(is.na(activity$steps))
+tot_NA
+```
+
+The total number of missing values in the data set is 2304.
+
+To fill in the missing values
+
+```{r imputing, echo=TRUE}
+ imp_activity <- activity
+ imp_activity$steps[which(is.na(activity$steps))] <- avg_steps[as.character(imp_activity$interval[which(is.na(activity$steps))])]
+```
+
+Total number of steps taken each day
+
+```{r steps_day, echo=TRUE}
+ steps_day <- tapply(imp_activity$steps, imp_activity$date, sum, na.rm = TRUE)
+ head(steps_day)
+```
+ 
+ 
+```{r stepsPerday, echo=TRUE}
+ StepsPerDay <- data.frame(steps_day)
+ g <- ggplot(StepsPerDay,aes(x = steps_day) ) +
+         geom_histogram( binwidth = 1000 ,color="black" , fill = "purple" ) 
+ g <- g + labs( title = "Total Number of Steps per Day", x= "Number of Steps", y= "Frequency") + xlim(c(0,25000))
+ g
+``` 
+ 
+Mean total number of steps
+
+```{r mean_tot, echo=TRUE}
+Mean_steps_day <- mean(steps_day)
+Mean_steps_day
+```
+ 
+Median number of steps
+
+```{r median_tot, echo=TRUE}
+ Median_steps_day <- median(steps_day)
+ Median_steps_day
+``` 
+
+Both the mean and the median total number of steps is 10766. After imputing for missing values, both the mean and median number of steps have increased per day, compared to when the missing values were not accounted for(first part of the assignment).
+ 
+##Are there differences in activity patterns between weekdays and weekends?
+ 
+Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+```{r imp_activity, echo=TRUE}
+ imp_activity$daytype <- ifelse(as.POSIXlt(imp_activity$date)$wday %in% c(0,6), "weekends","weekdays")
+```
+5-minute interval
+
+```{r Fmin, echo=TRUE}
+ Fmin_int <- aggregate(steps ~ interval + daytype, data=imp_activity, mean)
+```
+
+```{r FminPlot, echo=TRUE}
+ g <- ggplot(Fmin_int, aes(x= interval, y= steps)) + geom_line(colour = "red", size =1) + facet_grid(daytype ~ .)  
+ g <- g + xlab("5 Minute Interval") + ylab("Average number of steps")
+ g <- g + labs( title = "Average Number of Steps Over Time")
+ g
+``` 
+ 
+
