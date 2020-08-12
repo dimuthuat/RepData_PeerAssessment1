@@ -22,9 +22,9 @@ Tha data is downloaded from [Git Hub Repository](https://d396qusza40orc.cloudfro
 
 The variables included in this dataset are:
 
-steps: Number of steps taking in a 5-minute interval (missing values are coded as \color{red}{\verb|NA|}NA)
-date: The date on which the measurement was taken in YYYY-MM-DD format
-interval: Identifier for the 5-minute interval in which measurement was taken
+-steps: Number of steps taking in a 5-minute interval (missing values are coded as \color{red}{\verb|NA|}NA)
+-date: The date on which the measurement was taken in YYYY-MM-DD format
+-interval: Identifier for the 5-minute interval in which measurement was taken
 
 ## Downloading and Processing data
 
@@ -56,6 +56,7 @@ head(activity)
 str(activity)
 ``` 
 
+```{r summary, echo=TRUE}
 summary(activity)
 ```
 
@@ -66,7 +67,7 @@ activity$date <- as.Date(activity$date)
 ```
 
 
-##What is mean total number of steps taken per day?
+## What is mean total number of steps taken per day?
 
 Total number of steps taken per day:
 ```{r total_steps, echo=TRUE}
@@ -105,7 +106,7 @@ median_steps
 
 The mean number of steps is 9354 and the meadian number of steps is 10395.
 
-##What is the average daily activity pattern?
+## What is the average daily activity pattern?
 
 Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval(x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
@@ -132,7 +133,7 @@ max_interval
 
 The maximum average number of steps(206) is contained in the 835th interval. 
 
-##Imputing missing values
+## Imputing missing values
 
 Total number of NA
 
@@ -182,7 +183,7 @@ Median number of steps
 
 Both the mean and the median total number of steps is 10766. After imputing for missing values, both the mean and median number of steps have increased per day, compared to when the missing values were not accounted for(first part of the assignment).
  
-##Are there differences in activity patterns between weekdays and weekends?
+## Are there differences in activity patterns between weekdays and weekends?
  
 Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
